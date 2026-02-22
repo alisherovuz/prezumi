@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { getSupabase } from '@/lib/supabase'
 
 export default function ResumesPage() {
   const [resumes, setResumes] = useState<any[]>([])
@@ -12,9 +12,9 @@ export default function ResumesPage() {
 
   const loadResumes = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { user } } = await getSupabase().auth.getUser()
       if (!user) { window.location.href = '/auth/login'; return }
-      const { data } = await supabase.from('resumes').select('*').eq('user_id', user.id).order('updated_at', { ascending: false })
+      const { data } = await getSupabase().from('resumes').select('*').eq('user_id', user.id).order('updated_at', { ascending: false })
       setResumes(data || [])
     } catch (e) { console.error(e) }
     finally { setLoading(false) }
@@ -22,7 +22,7 @@ export default function ResumesPage() {
 
   const deleteResume = async (id: string) => {
     if (!confirm('Delete?')) return
-    await supabase.from('resumes').delete().eq('id', id)
+    await getSupabase().from('resumes').delete().eq('id', id)
     setResumes(resumes.filter(r => r.id !== id))
   }
 

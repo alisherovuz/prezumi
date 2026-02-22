@@ -1,21 +1,19 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+// Lazy initialization - only create client when needed
+let supabase: SupabaseClient | null = null
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-  }
-})
-
-export async function getCurrentUser() {
-  try {
-    const { data: { user }, error } = await supabase.auth.getUser()
-    if (error) throw error
-    return user
-  } catch {
-    return null
-  }
+export function getSupabase(): SupabaseClient {
+  if (supabase) return supabase
+  
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  
+  supabase = createClient(url, key, {
+    auth: { persistSession: true, autoRefreshToken: true }
+  })
+  
+  return supabase
 }
+
+export { supabase }

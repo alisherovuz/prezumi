@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { getSupabase } from '@/lib/supabase'
 
 export default function PortfolioPage() {
   const [loading, setLoading] = useState(true)
@@ -14,7 +14,7 @@ export default function PortfolioPage() {
   const [projects, setProjects] = useState<Array<{ id: string; title: string; description: string; link: string; tags: string }>>([])
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    getSupabase().auth.getUser().then(({ data: { user } }) => {
       if (!user) { window.location.href = '/auth/login'; return }
       setIsPro(false)
       setLoading(false)

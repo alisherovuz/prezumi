@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { getSupabase } from '@/lib/supabase'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -12,7 +12,7 @@ export default function LoginPage() {
 
   // Check if already logged in
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    getSupabase().auth.getUser().then(({ data: { user } }) => {
       if (user) window.location.href = '/dashboard'
     })
   }, [])
@@ -23,7 +23,7 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      const { error } = await getSupabase().auth.signInWithPassword({ email, password })
       if (error) throw error
       window.location.href = '/dashboard'
     } catch (err: any) {
@@ -35,7 +35,7 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { error } = await getSupabase().auth.signInWithOAuth({
         provider: 'google',
         options: { redirectTo: `${window.location.origin}/auth/callback` }
       })

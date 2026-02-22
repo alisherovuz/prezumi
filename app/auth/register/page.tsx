@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { getSupabase } from '@/lib/supabase'
 
 export default function RegisterPage() {
   const [name, setName] = useState('')
@@ -13,7 +13,7 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState('')
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    getSupabase().auth.getUser().then(({ data: { user } }) => {
       if (user) window.location.href = '/dashboard'
     })
   }, [])
@@ -25,7 +25,7 @@ export default function RegisterPage() {
     setSuccess('')
 
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { data, error } = await getSupabase().auth.signUp({
         email,
         password,
         options: { data: { name } }
@@ -52,7 +52,7 @@ export default function RegisterPage() {
 
   const handleGoogleLogin = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { error } = await getSupabase().auth.signInWithOAuth({
         provider: 'google',
         options: { redirectTo: `${window.location.origin}/auth/callback` }
       })

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { getSupabase } from '@/lib/supabase'
 import { User } from '@supabase/supabase-js'
 
 export default function DashboardPage() {
@@ -17,7 +17,7 @@ export default function DashboardPage() {
 
   const checkAuth = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { user } } = await getSupabase().auth.getUser()
       
       if (!user) {
         window.location.href = '/auth/login'
@@ -37,8 +37,8 @@ export default function DashboardPage() {
   const loadDocuments = async (userId: string) => {
     try {
       const [resumeRes, coverRes] = await Promise.all([
-        supabase.from('resumes').select('*').eq('user_id', userId).order('updated_at', { ascending: false }).limit(5),
-        supabase.from('cover_letters').select('*').eq('user_id', userId).order('updated_at', { ascending: false }).limit(5)
+        getSupabase().from('resumes').select('*').eq('user_id', userId).order('updated_at', { ascending: false }).limit(5),
+        getSupabase().from('cover_letters').select('*').eq('user_id', userId).order('updated_at', { ascending: false }).limit(5)
       ])
       
       setResumes(resumeRes.data || [])
@@ -49,7 +49,7 @@ export default function DashboardPage() {
   }
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
+    await getSupabase().auth.signOut()
     window.location.href = '/'
   }
 

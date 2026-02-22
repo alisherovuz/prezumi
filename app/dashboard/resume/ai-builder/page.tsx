@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { getSupabase } from '@/lib/supabase'
 
 const questions = [
   { id: 'jobTitle', question: "What's your desired job title?", placeholder: "e.g., Software Engineer" },
@@ -23,7 +23,7 @@ export default function AIBuilderPage() {
   const [generating, setGenerating] = useState(false)
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    getSupabase().auth.getUser().then(({ data: { user } }) => {
       if (!user) { window.location.href = '/auth/login'; return }
       setLoading(false)
     })

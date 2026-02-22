@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { getSupabase } from '@/lib/supabase'
 
 interface Experience { id: string; title: string; company: string; startDate: string; endDate: string; description: string }
 interface Education { id: string; degree: string; field: string; institution: string; year: string }
@@ -73,7 +73,7 @@ export default function ResumeEditorPage() {
 
   const loadResume = async (id: string) => {
     try {
-      const { data } = await supabase.from('resumes').select('*').eq('id', id).single()
+      const { data } = await getSupabase().from('resumes').select('*').eq('id', id).single()
       if (data) {
         setTemplate((data.template as keyof typeof templateStyles) || 'classic')
         setPersonalInfo(data.personal_info || {})
@@ -115,14 +115,14 @@ export default function ResumeEditorPage() {
   const saveResume = async () => {
     setSaving(true)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { user } } = await getSupabase().auth.getUser()
       if (!user) { window.location.href = '/auth/login'; return }
       const resumeData = {
         user_id: user.id, title: `${personalInfo.firstName} ${personalInfo.lastName} Resume`.trim() || 'Untitled',
         template, personal_info: personalInfo, summary, experience, education, skills, updated_at: new Date().toISOString()
       }
-      if (resumeId) await supabase.from('resumes').update(resumeData).eq('id', resumeId)
-      else await supabase.from('resumes').insert(resumeData)
+      if (resumeId) await getSupabase().from('resumes').update(resumeData).eq('id', resumeId)
+      else await getSupabase().from('resumes').insert(resumeData)
       alert('Saved!')
     } catch (e: any) { alert(e.message || 'Failed') }
     finally { setSaving(false) }

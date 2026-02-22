@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { getSupabase } from '@/lib/supabase'
 
 export default function NewCoverLetterPage() {
   const searchParams = useSearchParams()
@@ -24,7 +24,7 @@ export default function NewCoverLetterPage() {
 
   const loadLetter = async (id: string) => {
     try {
-      const { data } = await supabase.from('cover_letters').select('*').eq('id', id).single()
+      const { data } = await getSupabase().from('cover_letters').select('*').eq('id', id).single()
       if (data) {
         setTargetJob(data.job_title || '')
         setCompany(data.company_name || '')
@@ -52,7 +52,7 @@ export default function NewCoverLetterPage() {
   const saveLetter = async () => {
     setSaving(true)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { user } } = await getSupabase().auth.getUser()
       if (!user) { window.location.href = '/auth/login'; return }
       
       const letterData = {
@@ -65,9 +65,9 @@ export default function NewCoverLetterPage() {
       }
 
       if (letterId) {
-        await supabase.from('cover_letters').update(letterData).eq('id', letterId)
+        await getSupabase().from('cover_letters').update(letterData).eq('id', letterId)
       } else {
-        await supabase.from('cover_letters').insert(letterData)
+        await getSupabase().from('cover_letters').insert(letterData)
       }
       alert('Saved!')
     } catch (e: any) { alert(e.message || 'Failed') }

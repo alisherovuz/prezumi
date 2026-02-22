@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { getSupabase } from '@/lib/supabase'
 
 export default function CoverLettersPage() {
   const [letters, setLetters] = useState<any[]>([])
@@ -12,9 +12,9 @@ export default function CoverLettersPage() {
 
   const loadLetters = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { user } } = await getSupabase().auth.getUser()
       if (!user) { window.location.href = '/auth/login'; return }
-      const { data } = await supabase.from('cover_letters').select('*').eq('user_id', user.id).order('updated_at', { ascending: false })
+      const { data } = await getSupabase().from('cover_letters').select('*').eq('user_id', user.id).order('updated_at', { ascending: false })
       setLetters(data || [])
     } catch (e) { console.error(e) }
     finally { setLoading(false) }
@@ -22,7 +22,7 @@ export default function CoverLettersPage() {
 
   const deleteLetter = async (id: string) => {
     if (!confirm('Delete?')) return
-    await supabase.from('cover_letters').delete().eq('id', id)
+    await getSupabase().from('cover_letters').delete().eq('id', id)
     setLetters(letters.filter(l => l.id !== id))
   }
 
