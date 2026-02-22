@@ -1,11 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { getSupabase } from '@/lib/supabase'
 
-export default function NewCoverLetterPage() {
+function CoverLetterContent() {
   const searchParams = useSearchParams()
   const letterId = searchParams.get('id')
   
@@ -64,11 +64,8 @@ export default function NewCoverLetterPage() {
         updated_at: new Date().toISOString()
       }
 
-      if (letterId) {
-        await getSupabase().from('cover_letters').update(letterData).eq('id', letterId)
-      } else {
-        await getSupabase().from('cover_letters').insert(letterData)
-      }
+      if (letterId) await getSupabase().from('cover_letters').update(letterData).eq('id', letterId)
+      else await getSupabase().from('cover_letters').insert(letterData)
       alert('Saved!')
     } catch (e: any) { alert(e.message || 'Failed') }
     finally { setSaving(false) }
@@ -143,5 +140,14 @@ export default function NewCoverLetterPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+// Main export with Suspense wrapper
+export default function NewCoverLetterPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin"></div></div>}>
+      <CoverLetterContent />
+    </Suspense>
   )
 }
